@@ -1,0 +1,112 @@
+<header class="topbar">
+  <div class="topbar__left">Administrador</div>
+  <div class="topbar__right">Hola, {{ usuario }}</div>
+</header>
+<hr class="topbar__divider" />
+
+<section class="page">
+  <h1 class="page__title">Usuarios</h1>
+
+  <!-- Botonera -->
+  <div class="actions">
+    <button
+      *ngFor="let a of acciones"
+      class="tp-btn tp-btn--green"
+      type="button"
+      (click)="onAccion(a.action)"
+    >
+      {{ a.label }}
+    </button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-card">
+    <table class="tp-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Último acceso</th>
+          <th style="width:150px">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of usuarios">
+          <td>{{ u.nombre }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.rol }}</td>
+          <td>
+            <span class="badge"
+              [class.badge--ok]="u.estado==='Activo'"
+              [class.badge--off]="u.estado==='Inactivo'">
+              {{ u.estado }}
+            </span>
+          </td>
+          <td>{{ u.ultimoAcceso ? (u.ultimoAcceso | date:'dd-MM-y HH:mm') : '—' }}</td>
+          <td class="row-actions">
+            <button class="mini-btn" (click)="openEdit(u)">Editar</button>
+            <button class="mini-btn mini-btn--danger" (click)="delete(u)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== Modal Agregar/Editar Usuario ===== -->
+<div class="modal-backdrop" *ngIf="modalOpen" (click)="closeModal()"></div>
+
+<div class="modal" *ngIf="modalOpen" role="dialog" aria-modal="true">
+  <div class="modal__head">
+    <h3>{{ mode === 'create' ? 'Agregar usuario' : 'Editar usuario' }}</h3>
+    <button class="icon-btn" (click)="closeModal()" aria-label="Cerrar">✕</button>
+  </div>
+
+  <div class="modal__body">
+    <div class="field">
+      <label>Nombre <span class="req">*</span></label>
+      <input type="text" [(ngModel)]="form.nombre" placeholder="Nombre completo" />
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Email <span class="req">*</span></label>
+        <input type="email" [(ngModel)]="form.email" placeholder="correo@dominio.com" />
+      </div>
+      <div class="field">
+        <label>Rol</label>
+        <select [(ngModel)]="form.rol">
+          <option value="Administrador">Administrador</option>
+          <option value="Supervisor">Supervisor</option>
+          <option value="Residente">Residente</option>
+          <option value="Tesorero">Tesorero</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Estado</label>
+        <select [(ngModel)]="form.estado">
+          <option value="Activo">Activo</option>
+          <option value="Inactivo">Inactivo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Último acceso</label>
+        <input type="datetime-local" [(ngModel)]="form.ultimoAcceso" />
+      </div>
+    </div>
+  </div>
+
+  <div class="modal__foot">
+    <button class="tp-btn" (click)="closeModal()" [disabled]="saving">Cancelar</button>
+    <button class="tp-btn tp-btn--green"
+            (click)="save()"
+            [disabled]="saving || !form.nombre || !form.email">
+      {{ mode === 'create' ? 'Guardar' : 'Actualizar' }}
+    </button>
+  </div>
+</div>

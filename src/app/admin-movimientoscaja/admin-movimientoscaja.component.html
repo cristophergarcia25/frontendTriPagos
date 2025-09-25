@@ -1,0 +1,133 @@
+<header class="topbar">
+  <div class="topbar__left">Administrador</div>
+  <div class="topbar__right">Hola, {{ usuario }}</div>
+</header>
+<hr class="topbar__divider" />
+
+<section class="page">
+  <h1 class="page__title">Movimientos de Caja</h1>
+
+  <!-- Botonera -->
+  <div class="actions">
+    <button *ngFor="let a of acciones"
+            class="tp-btn tp-btn--green"
+            type="button"
+            (click)="onAccion(a.action)">
+      {{ a.label }}
+    </button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-card">
+    <table class="tp-table tp-table--caja">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Fecha</th>
+          <th>Monto</th>
+          <th>Moneda</th>
+          <th>Descripción</th>
+          <th>Usuario</th>
+          <th>Estado</th>
+          <th style="width:160px">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let m of movimientos">
+          <!-- Tipo -->
+          <td>
+            <ng-container *ngIf="!m.edit; else tipoEdit">
+              {{ m.tipo }}
+            </ng-container>
+            <ng-template #tipoEdit>
+              <select [(ngModel)]="m.tipo">
+                <option value="apertura">Apertura</option>
+                <option value="ingreso">Ingreso</option>
+                <option value="egreso">Egreso</option>
+                <option value="cierre">Cierre</option>
+              </select>
+            </ng-template>
+          </td>
+
+          <!-- Fecha -->
+          <td>
+            <ng-container *ngIf="!m.edit; else fechaEdit">
+              {{ m.fecha }}
+            </ng-container>
+            <ng-template #fechaEdit>
+              <input type="date" [(ngModel)]="m.fecha" />
+            </ng-template>
+          </td>
+
+          <!-- Monto -->
+          <td>
+            <ng-container *ngIf="!m.edit; else montoEdit">
+              {{ m.monto | currency:m.moneda:'symbol' }}
+            </ng-container>
+            <ng-template #montoEdit>
+              <input type="number" [(ngModel)]="m.monto" min="0" step="0.01" />
+            </ng-template>
+          </td>
+
+          <!-- Moneda -->
+          <td>
+            <ng-container *ngIf="!m.edit; else monedaEdit">
+              {{ m.moneda }}
+            </ng-container>
+            <ng-template #monedaEdit>
+              <select [(ngModel)]="m.moneda">
+                <option value="GTQ">GTQ</option>
+                <option value="USD">USD</option>
+              </select>
+            </ng-template>
+          </td>
+
+          <!-- Descripción -->
+          <td>
+            <ng-container *ngIf="!m.edit; else descEdit">
+              {{ m.descripcion || '—' }}
+            </ng-container>
+            <ng-template #descEdit>
+              <input type="text" [(ngModel)]="m.descripcion" placeholder="Motivo o detalle" />
+            </ng-template>
+          </td>
+
+          <!-- Usuario -->
+          <td>{{ m.usuario_id }}</td>
+
+          <!-- Estado -->
+          <td>
+            <ng-container *ngIf="!m.edit; else estadoEdit">
+              <span class="badge"
+                    [class.badge--ok]="m.estado==='confirmado'"
+                    [class.badge--warn]="m.estado==='pendiente'"
+                    [class.badge--off]="m.estado==='anulado'">
+                {{ m.estado }}
+              </span>
+            </ng-container>
+            <ng-template #estadoEdit>
+              <select [(ngModel)]="m.estado">
+                <option value="pendiente">Pendiente</option>
+                <option value="confirmado">Confirmado</option>
+                <option value="anulado">Anulado</option>
+              </select>
+            </ng-template>
+          </td>
+
+          <!-- Acciones -->
+          <td class="row-actions">
+            <ng-container *ngIf="!m.edit; else editBtns">
+              <button class="mini-btn" (click)="toggleEdit(m)">Editar</button>
+              <button class="mini-btn mini-btn--danger" (click)="remove(m)">Eliminar</button>
+            </ng-container>
+            <ng-template #editBtns>
+              <button class="mini-btn mini-btn--green" (click)="saveRow(m)" [disabled]="m.monto <= 0">Guardar</button>
+              <button class="mini-btn" (click)="cancelRow(m)">Cancelar</button>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

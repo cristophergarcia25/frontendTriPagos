@@ -3,17 +3,22 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 type Estado = 'Activo' | 'Inactivo';
+type CostoTipo = 'gratis' | 'monto_fijo' | 'por_hora';
 
-type Area = {
+type Amenidad = {
   id: string;
   nombre: string;
+  descripcion?: string;
   ubicacion?: string;
-  abre?: string;   // '08:00'
-  cierra?: string; // '20:00'
+  abre?: string;
+  cierra?: string;
   requiereReserva: boolean;
   capacidad?: number;
+  costo_tipo: CostoTipo;
+  costo_valor?: number;
+  deposito_requerido?: number;
+  reglas?: string[];
   estado: Estado;
-  edit?: boolean; // UI only
 };
 
 @Component({
@@ -28,68 +33,100 @@ export class AdminAreascomunalesComponent {
 
   acciones = [
     { label: 'Nueva Área', action: 'nueva' },
-    { label: 'Guardar Cambios', action: 'guardar' },
     { label: 'Exportar', action: 'exportar' },
   ];
 
-  // Mock data
-  areas: Area[] = [
-    { id: 'a1', nombre: 'Salón de eventos', ubicacion: 'Torre A - PB', abre: '09:00', cierra: '21:00', requiereReserva: true, capacidad: 60, estado: 'Activo' },
-    { id: 'a2', nombre: 'Cancha', ubicacion: 'Patio central', abre: '06:00', cierra: '22:00', requiereReserva: false, capacidad: 10, estado: 'Activo' },
-    { id: 'a3', nombre: 'Churrasquera', ubicacion: 'Azotea', abre: '10:00', cierra: '20:00', requiereReserva: true, capacidad: 20, estado: 'Inactivo' },
+  areas: Amenidad[] = [
+    {
+      id: 'a1',
+      nombre: 'Salón de eventos',
+      descripcion: 'Ideal para reuniones grandes',
+      ubicacion: 'Torre A - PB',
+      abre: '09:00',
+      cierra: '21:00',
+      requiereReserva: true,
+      capacidad: 60,
+      costo_tipo: 'monto_fijo',
+      costo_valor: 500,
+      deposito_requerido: 200,
+      reglas: ['No fumar', 'Dejar limpio'],
+      estado: 'Activo',
+    },
+    {
+      id: 'a2',
+      nombre: 'Cancha',
+      descripcion: 'De fútbol 5',
+      ubicacion: 'Patio central',
+      abre: '06:00',
+      cierra: '22:00',
+      requiereReserva: false,
+      capacidad: 10,
+      costo_tipo: 'gratis',
+      estado: 'Activo',
+    },
   ];
 
+  amenidadSeleccionada: Amenidad | null = null;
+  modo: 'ver' | 'editar' | 'nuevo' | null = null;
+  reglasStr = '';
+
   onAccion(key: string) {
-    if (key === 'nueva') this.addArea();
-    if (key === 'guardar') this.saveAll();
+    if (key === 'nueva') this.agregar();
   }
 
-  addArea() {
-    const tmp: Area = {
+  verDetalles(a: Amenidad) {
+    this.amenidadSeleccionada = { ...a };
+    this.reglasStr = a.reglas?.join('; ') || '';
+    this.modo = 'ver';
+  }
+
+  editar(a: Amenidad) {
+    this.amenidadSeleccionada = { ...a };
+    this.reglasStr = a.reglas?.join('; ') || '';
+    this.modo = 'editar';
+  }
+
+  agregar() {
+    this.amenidadSeleccionada = {
       id: 'tmp-' + Math.random().toString(36).slice(2, 9),
       nombre: '',
-      ubicacion: '',
-      abre: '08:00',
-      cierra: '20:00',
       requiereReserva: true,
       capacidad: 1,
+      costo_tipo: 'gratis',
       estado: 'Activo',
-      edit: true,
     };
-    this.areas = [tmp, ...this.areas];
+    this.reglasStr = '';
+    this.modo = 'nuevo';
   }
 
-  toggleEdit(a: Area) {
-    a.edit = !a.edit;
+  cerrarModal() {
+    this.amenidadSeleccionada = null;
+    this.modo = null;
+    this.reglasStr = '';
   }
 
-  remove(a: Area) {
-    this.areas = this.areas.filter(x => x.id !== a.id);
-  }
+  guardarCambios() {
+    if (!this.amenidadSeleccionada) return;
 
-  saveRow(a: Area) {
-    // Validaciones mínimas
-    if (!a.nombre?.trim()) return;
-    if (!a.abre || !a.cierra) return;
-    a.nombre = a.nombre.trim();
-    a.ubicacion = a.ubicacion?.trim();
-    a.edit = false;
-  }
+    this.amenidadSeleccionada.reglas = this.reglasStr
+      .split(';')
+      .map(r => r.trim())
+      .filter(r => r);
 
-  cancelRow(a: Area) {
-    // Si es nuevo y cancelan, lo quitamos
-    if (a.id.startsWith('tmp-')) {
-      this.remove(a);
-    } else {
-      a.edit = false;
+    const existe = this.areas.find(a => a.id === this.amenidadSeleccionada?.id);
+
+    if (existe && this.modo === 'editar') {
+      this.areas = this.areas.map(a =>
+        a.id === this.amenidadSeleccionada?.id ? this.amenidadSeleccionada! : a
+      );
+    } else if (this.modo === 'nuevo') {
+      this.areas = [...this.areas, this.amenidadSeleccionada];
     }
+
+    this.cerrarModal();
   }
 
-  saveAll() {
-    // Aquí llamarías tu API para persistir cambios
-    const payload = this.areas.map(({ edit, ...api }) => api);
-    console.log('Guardar en backend:', payload);
-    // Feedback visual simple: salir de modo edición
-    this.areas = this.areas.map(a => ({ ...a, edit: false }));
+  eliminar(a: Amenidad) {
+    this.areas = this.areas.filter(x => x.id !== a.id);
   }
 }

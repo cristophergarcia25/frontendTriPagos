@@ -20,6 +20,10 @@ import { AdminAreascomunalesComponent } from './admin-areascomunales/admin-areas
 import { AdminReportesComponent } from './admin-reportes/admin-reportes.component';
 import { AdminConfiguracionComponent } from './admin-configuracion/admin-configuracion.component';
 import { userOnlyGuard } from './guard/auth.guard';
+import { AdminNotascobroComponent } from './admin-notascobro/admin-notascobro.component';
+import { AdminRecibosComponent } from './admin-recibos/admin-recibos.component';
+import { AdminMovimientoscajaComponent } from './admin-movimientoscaja/admin-movimientoscaja.component';
+import { UsuariosComponent } from './usuarios/usuarios.component';
 
 export const routes: Routes = [
  // Rutas de usuario normal (bloqueadas para admin con el guard)
@@ -44,5 +48,10 @@ export const routes: Routes = [
   { path: 'admin-areascomunales', component: AdminAreascomunalesComponent},
   { path: 'admin-reportes', component: AdminReportesComponent},
   { path: 'admin-configuracion', component: AdminConfiguracionComponent},
+  { path: 'admin-notascobro', component: AdminNotascobroComponent},
+  { path: 'admin-recibos', component: AdminRecibosComponent},
+  { path: 'admin-movimientoscaja', component: AdminMovimientoscajaComponent},
+  { path: 'admin-usuarios', component: UsuariosComponent},
+
   { path: '**', redirectTo: '' } // Ruta comodín redirige a la landing
 ];

@@ -30,6 +30,7 @@
           <th>Fecha</th>
           <th>Hora</th>
           <th>Estado</th>
+          <th style="width:180px">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -47,6 +48,14 @@
               {{ r.estado }}
             </span>
           </td>
+          <td class="row-actions">
+            <button class="mini-btn mini-btn--green" (click)="confirmar(r)" [disabled]="r.estado==='Confirmada'">
+              Confirmar
+            </button>
+            <button class="mini-btn mini-btn--danger" (click)="cancelar(r)" [disabled]="r.estado==='Cancelada'">
+              Cancelar
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -63,20 +72,22 @@
   </div>
 
   <div class="modal__body">
-    <div class="field">
-      <label>Área / Amenidad <span class="req">*</span></label>
-      <select [(ngModel)]="form.area" (ngModelChange)="checkOverlapOnChange()">
-        <option value="" disabled selected>Selecciona un área</option>
-        <option *ngFor="let a of areas" [value]="a">{{ a }}</option>
-      </select>
-    </div>
-
     <div class="grid-2">
+      <div class="field">
+        <label>Área / Amenidad <span class="req">*</span></label>
+        <select [(ngModel)]="form.area" (ngModelChange)="checkOverlapOnChange()">
+          <option value="" disabled selected>Selecciona un área</option>
+          <option *ngFor="let a of areas" [value]="a">{{ a }}</option>
+        </select>
+      </div>
+
       <div class="field">
         <label>Fecha <span class="req">*</span></label>
         <input type="date" [(ngModel)]="form.fecha" (ngModelChange)="checkOverlapOnChange()" />
       </div>
+    </div>
 
+    <div class="grid-2">
       <div class="field">
         <label>Horario <span class="req">*</span></label>
         <select [(ngModel)]="form.hora" (ngModelChange)="checkOverlapOnChange()">
@@ -84,14 +95,13 @@
           <option *ngFor="let h of horarios" [value]="h">{{ h }}</option>
         </select>
 
-        <!-- Mensaje de error por traslape -->
         <div class="field__error" *ngIf="overlapError">
           {{ overlapError }}
         </div>
       </div>
+      <div></div>
     </div>
 
-    <!-- Opcionales -->
     <div class="grid-2">
       <div class="field">
         <label>Unidad (opcional)</label>
