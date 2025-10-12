@@ -2,121 +2,155 @@
   <div class="topbar__left">Administrador</div>
   <div class="topbar__right">Hola, {{ usuario }}</div>
 </header>
+
 <hr class="topbar__divider" />
 
 <section class="page">
   <h1 class="page__title">Dashboard</h1>
 
-  <!-- KPIs en cards -->
   <!-- KPIs -->
-<div class="kpi-cards">
-  <div class="kpi-card success" (click)="goTo('/pagos')">
-    <div class="kpi-info">
-      <div class="kpi-label">Deuda actual</div>
-      <div class="kpi-value">Q{{ deudaActual | number:'1.2-2' }}</div>
+  <div class="kpi-cards">
+    <div class="kpi-card success" (click)="goTo('/pagos')">
+      <div class="kpi-info">
+        <div class="kpi-label">Deuda actual</div>
+        <div class="kpi-value">Q{{ deudaActual | number:'1.2-2' }}</div>
+      </div>
+    </div>
+
+    <div class="kpi-card info" (click)="goTo('/pagos')">
+      <div class="kpi-info">
+        <div class="kpi-label">Pagos aprobados (mes)</div>
+        <div class="kpi-value">{{ pagosAprobadosMes }}</div>
+      </div>
+    </div>
+
+    <div class="kpi-card primary" (click)="goTo('/ingresos')">
+      <div class="kpi-info">
+        <div class="kpi-label">Ingresos (mes)</div>
+        <div class="kpi-value">Q{{ ingresosMes | number:'1.2-2' }}</div>
+      </div>
+    </div>
+
+    <div class="kpi-card danger" (click)="goTo('/egresos')">
+      <div class="kpi-info">
+        <div class="kpi-label">Egresos (mes)</div>
+        <div class="kpi-value">Q{{ egresosMes | number:'1.2-2' }}</div>
+      </div>
+    </div>
+
+    <div class="kpi-card warning" (click)="goTo('/caja')">
+      <div class="kpi-info">
+        <div class="kpi-label">Saldo de Caja</div>
+        <div class="kpi-value">Q{{ saldoCaja | number:'1.2-2' }}</div>
+      </div>
     </div>
   </div>
 
-  <div class="kpi-card info" (click)="goTo('/pagos')">
-    <div class="kpi-info">
-      <div class="kpi-label">Pagos aprobados (mes)</div>
-      <div class="kpi-value">{{ pagosAprobadosMes }}</div>
+  <!-- 📊 Gráficos -->
+  <div class="charts-grid">
+    <div class="card">
+      <h2 class="section__title">Resumen Financiero</h2>
+      <canvas id="chartFinanciero"></canvas>
+    </div>
+
+    <div class="card">
+      <h2 class="section__title">Distribución General</h2>
+      <canvas id="chartDistribucion"></canvas>
+    </div>
+
+    <div class="card">
+      <h2 class="section__title">Estado General</h2>
+      <canvas id="chartEstado"></canvas>
     </div>
   </div>
-
-  <div class="kpi-card primary" (click)="goTo('/ingresos')">
-    <div class="kpi-info">
-      <div class="kpi-label">Ingresos (mes)</div>
-      <div class="kpi-value">Q{{ ingresosMes | number:'1.2-2' }}</div>
-    </div>
+<div class="charts-grid">
+  <div class="card">
+    <h2 class="section__title">Saldos pagados y pendientes en el mes</h2>
+    <canvas id="chartPagosMes"></canvas>
   </div>
 
-  <div class="kpi-card danger" (click)="goTo('/egresos')">
-    <div class="kpi-info">
-      <div class="kpi-label">Egresos (mes)</div>
-      <div class="kpi-value">Q{{ egresosMes | number:'1.2-2' }}</div>
-    </div>
+  <div class="card">
+    <h2 class="section__title">Saldos pendientes y pagados acumulados</h2>
+    <canvas id="chartPagosAcumulados"></canvas>
   </div>
 
-  <div class="kpi-card warning" (click)="goTo('/caja')">
-    <div class="kpi-info">
-      <div class="kpi-label">Saldo de Caja</div>
-      <div class="kpi-value">Q{{ saldoCaja | number:'1.2-2' }}</div>
-    </div>
+  <div class="card">
+    <h2 class="section__title">Comportamiento de pago mensual</h2>
+    <canvas id="chartComportamiento"></canvas>
+  </div>
+
+  <div class="card">
+    <h2 class="section__title">Tasa de cumplimiento de pago</h2>
+    <canvas id="chartCumplimiento"></canvas>
   </div>
 </div>
-
-<!-- Pagos recientes -->
-<div class="card clickable" (click)="goTo('/admin-pagos')">
-  <h2 class="section__title">Pagos recientes</h2>
-  <div class="table-card">
-    <table class="tp-table">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Descripción</th>
-          <th>Monto</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let p of pagosRecientes">
-          <td>{{ p.fecha | date:'dd MMM, y' }}</td>
-          <td>{{ p.descripcion }}</td>
-          <td>Q{{ p.monto | number:'1.2-2' }}</td>
-        </tr>
-      </tbody>
-    </table>
+<div class="card notas-mini">
+  <div class="notas-mini-header">
+    <h2 class="section__title">Notas de Cobro</h2>
+    <div class="notas-mini-stats">
+      <div class="stat procesadas">
+        <span class="numero">{{ notasProcesadas }}</span>
+        <span class="label">Procesadas</span>
+      </div>
+      <div class="stat pendientes">
+        <span class="numero">{{ notasPendientesCount }}</span>
+        <span class="label">Pendientes</span>
+      </div>
+    </div>
   </div>
+
+  <canvas id="chartNotasCobro" class="notas-mini-chart"></canvas>
 </div>
 
-<!-- Notas de cobro pendientes -->
-<div class="card clickable" (click)="goTo('/admin-notascobro')">
-  <h2 class="section__title">Notas de Cobro Pendientes</h2>
-  <div class="table-card">
-    <table class="tp-table">
-      <thead>
-        <tr>
-          <th>Unidad</th>
-          <th>Concepto</th>
-          <th>Monto</th>
-          <th>Vencimiento</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let n of notasPendientes">
-          <td>{{ n.unidad }}</td>
-          <td>{{ n.concepto }}</td>
-          <td>Q{{ n.monto | number:'1.2-2' }}</td>
-          <td>{{ n.fecha_vencimiento | date:'dd MMM, y' }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
 
-<!-- Reservaciones próximas -->
-<div class="card clickable" (click)="goTo('/reservaciones')">
-  <h2 class="section__title">Reservaciones Próximas</h2>
-  <div class="table-card">
-    <table class="tp-table">
-      <thead>
-        <tr>
-          <th>Amenidad</th>
-          <th>Residente</th>
-          <th>Fecha</th>
-          <th>Horario</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let r of reservacionesProximas">
-          <td>{{ r.amenidad }}</td>
-          <td>{{ r.residente }}</td>
-          <td>{{ r.fecha | date:'dd MMM, y' }}</td>
-          <td>{{ r.horario }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
 
+  <!-- 🧾 Tablas -->
+  <div class="card clickable" (click)="goTo('/admin-pagos')">
+    <h2 class="section__title">Pagos recientes</h2>
+    <div class="table-card">
+      <table class="tp-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Monto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of pagosRecientes">
+            <td>{{ p.fecha | date:'dd MMM, y' }}</td>
+            <td>{{ p.descripcion }}</td>
+            <td>Q{{ p.monto | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+
+  <div class="card clickable" (click)="goTo('/reservaciones')">
+    <h2 class="section__title">Reservaciones Próximas</h2>
+    <div class="table-card">
+      <table class="tp-table">
+        <thead>
+          <tr>
+            <th>Amenidad</th>
+            <th>Residente</th>
+            <th>Fecha</th>
+            <th>Horario</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of reservacionesProximas">
+            <td>{{ r.amenidad }}</td>
+            <td>{{ r.residente }}</td>
+            <td>{{ r.fecha | date:'dd MMM, y' }}</td>
+            <td>{{ r.horario }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </section>

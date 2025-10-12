@@ -138,3 +138,27 @@ $tp-border: rgba(0,0,0,.08);
   display: block;
   background: #f9fafb; /* gris suave para resaltar las cards */
 }
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.card canvas {
+  width: 100% !important;
+  height: 280px !important;
+  aspect-ratio: 1 / 1;
+  display: block;
+  margin: auto;
+}
+
+/* Ajuste individual para mantener simetría */
+#chartFinanciero {
+  height: 320px !important;
+}
+
+#chartDistribucion,
+#chartEstado {
+  height: 260px !important;
+}
